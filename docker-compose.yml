@@ -1,0 +1,10 @@
+version: "3.5"
+
+services:
+  eifb-service:
+    container_name: eifb-service
+    build: 
+      context: .
+      dockerfile: eifb/Dockerfile
+    ports:
+      - 8080:8080
