@@ -7,7 +7,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\shared\YandexCloud\YandexCloud.csproj" />
+      <ProjectReference Include="..\..\core\DependencyRegistrar\DependencyRegistrar.csproj" />
+      <ProjectReference Include="..\..\core\Extensions\Extensions.csproj" />
       <ProjectReference Include="..\ArticleManager.Contracts\ArticleManager.Contracts.csproj" />
     </ItemGroup>
 

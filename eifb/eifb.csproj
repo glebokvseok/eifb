@@ -9,6 +9,7 @@
     <ItemGroup>
       <ProjectReference Include="..\modules\ArticleManager\ArticleManager.csproj" />
       <ProjectReference Include="..\modules\AuthenticationService\AuthenticationService.csproj" />
+      <ProjectReference Include="..\modules\SearchService\SearchService.csproj" />
     </ItemGroup>
 
     <ItemGroup>

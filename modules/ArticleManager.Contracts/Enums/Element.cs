@@ -1,4 +1,4 @@
-namespace ArticleManager.Models;
+namespace ArticleManager.Contracts.Enums;
 
 public enum Element
 {

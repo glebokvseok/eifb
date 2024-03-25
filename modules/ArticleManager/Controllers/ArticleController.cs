@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using ArticleManager.Dto;
@@ -91,5 +90,5 @@ public class ArticleController : Controller
         return File(file.DataStream, file.ContentType, file.Name);
     }
 
-    private static string GetFileDownloadLink(string key) => $"${DownloadFilePath}?key={key}";
+    private static string GetFileDownloadLink(string key) => $"{DownloadFilePath}?key={key}";
 }

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
+using System.Threading;
 using System.Threading.Tasks;
 using AuthenticationService.Models;
 using AuthenticationService.Models.Tokens;
@@ -46,15 +47,17 @@ public class UserController : Controller
     }
     
     [HttpPost("register")]
-    public async Task<IActionResult> Register([FromBody] RegistrationModel user) 
+    public async Task<IActionResult> Register(
+        [FromBody] RegistrationModel user,
+        CancellationToken cancellationToken) 
     {
         user.Password = _cryptographer.Encrypt(user.Password);
         try 
         {
-            if (await _userRepository.CheckUserExistence(user.Login))
+            if (await _userRepository.CheckUserExistence(user.Login, cancellationToken))
                 return BadRequest("Account with this login is already registered.");
 
-            if (!await _userRepository.AddUser(user))
+            if (!await _userRepository.AddUser(user, cancellationToken))
                 return Ok("Failed to add user.");
         } 
         catch 
@@ -66,12 +69,14 @@ public class UserController : Controller
     }
     
     [HttpPost("authorize")]
-    public async Task<IActionResult> Authorize([FromBody] AuthenticationModel account) 
+    public async Task<IActionResult> Authorize(
+        [FromBody] AuthenticationModel account,
+        CancellationToken cancellationToken) 
     {
         string? password;
         try 
         {
-            password = await _userRepository.GetUserPassword(account.Login);
+            password = await _userRepository.GetUserPassword(account.Login, cancellationToken);
         } 
         catch 
         {
@@ -98,7 +103,8 @@ public class UserController : Controller
     }
     
     [HttpGet("refresh")]
-    public IActionResult Refresh() 
+    public IActionResult Refresh(
+        CancellationToken cancellationToken) 
     {
         var refreshToken = Request.Headers["Token"].ToString();
         var refreshTokenData = new RefreshTokenData(_refreshTokenConfig);

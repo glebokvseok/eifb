@@ -1,4 +1,5 @@
 using System;
+using ArticleManager.Contracts.Enums;
 
 namespace ArticleManager.Models;
 
