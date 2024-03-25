@@ -12,6 +12,7 @@ public static class Program {
         return Host
             .CreateDefaultBuilder(args)
             .ConfigureServices(Registrar.Register<ArticleManager.Module>)
+            .ConfigureServices(Registrar.Register<AuthenticationService.Module>)
             .ConfigureWebHostDefaults(builder => builder.UseStartup<Startup>());
     }
 }
