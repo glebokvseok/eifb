@@ -1,7 +1,10 @@
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using ArticleManager.Dto;
+using ArticleManager.Models;
+using ArticleManager.Services;
 using Microsoft.AspNetCore.Mvc;
 using YandexCloud.Clients;
 
@@ -11,15 +14,17 @@ namespace ArticleManager.Controllers;
 [Route("article")]
 public class ArticleController : Controller
 {
+    private const string DownloadFilePath = "http://localhost:8080/article/download";
+    
     private readonly IYandexCloudStorageClient _yandexCloudStorageClient;
-    private readonly IDictionary<int, UploadArticleRequest> _storage; // temporary
+    private readonly IArticleRepository _articleRepository;
     
     public ArticleController(
         IYandexCloudStorageClient yandexCloudStorageClient,
-        IStorageKeeper storageKeeper)
+        IArticleRepository articleRepository)
     {
         _yandexCloudStorageClient = yandexCloudStorageClient;
-        _storage = storageKeeper.Storage;
+        _articleRepository = articleRepository;
     }
     
     [HttpPost("upload")]
@@ -27,13 +32,6 @@ public class ArticleController : Controller
         [FromBody] UploadArticleRequest request,
         CancellationToken cancellationToken)
     {
-        if (_storage.ContainsKey(request.ArticleDescription.Id))
-        {
-            return BadRequest("Article with this id already exists");
-        }
-        
-        _storage.Add(request.ArticleDescription.Id, request);
-
         if (request.ArticleFile is not null)
         {
             await _yandexCloudStorageClient.UploadFile(
@@ -41,6 +39,29 @@ public class ArticleController : Controller
                 request.ArticleFile.Content,
                 cancellationToken);
         }
+
+        var article = new Article
+        {
+            Author = request.ArticleDescription.Author,
+            Position = request.ArticleDescription.Position,
+            University = request.ArticleDescription.University,
+            Faculty = request.ArticleDescription.Faculty,
+            Name = request.ArticleDescription.Name,
+            Annotation = request.ArticleDescription.Annotation,
+            Content = request.ArticleDescription.Content,
+            Date = DateTime.Now,
+            Link = request.ArticleFile is null ? null : GetFileDownloadLink(request.ArticleFile.Name),
+            Degree = request.ArticleDescription.Degree,
+            Element = request.ArticleDescription.Element,
+            Form = request.ArticleDescription.Form,
+            Format = request.ArticleDescription.Format,
+            Variant = request.ArticleDescription.Variant,
+            Application = request.ArticleDescription.Application,
+            Blum = request.ArticleDescription.Blum,
+            Difficulty = request.ArticleDescription.Difficulty,
+        };
+
+        await _articleRepository.AddArticle(article, cancellationToken);
         
         return Ok();
     }
@@ -50,12 +71,12 @@ public class ArticleController : Controller
         [FromQuery] int id,
         CancellationToken cancellationToken)
     {
-        if (!_storage.ContainsKey(id))
-        {
-            return NotFound("Article with this id does not exist");
-        }
+        var article = await _articleRepository.GetArticle(id, cancellationToken);
 
-        _storage.TryGetValue(id, out var article);
+        if (article is null)
+        {
+            return NotFound();
+        }
         
         return Ok(article);
     }
@@ -69,4 +90,6 @@ public class ArticleController : Controller
 
         return File(file.DataStream, file.ContentType, file.Name);
     }
+
+    private static string GetFileDownloadLink(string key) => $"${DownloadFilePath}?key={key}";
 }
