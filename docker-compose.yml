@@ -8,3 +8,22 @@ services:
       dockerfile: eifb/Dockerfile
     ports:
       - 8080:8080
+    depends_on:
+      eifb-service-db:
+        condition: service_healthy
+
+  eifb-service-db:
+    image: postgres:16.2
+    container_name: eifb-service-db
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=eifb
+      - PGPORT=5432
+    volumes:
+      - ./migrations:/docker-entrypoint-initdb.d/
+      # - ./data:/var/lib/postgresql/data
+    healthcheck:
+      test: "exit 0"

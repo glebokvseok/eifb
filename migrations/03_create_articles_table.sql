@@ -1,0 +1,20 @@
+CREATE TABLE IF NOT EXISTS articles(
+   id SERIAL PRIMARY KEY,
+   author TEXT NOT NULL,
+   position TEXT NOT NULL,
+   university TEXT NOT NULL,
+   faculty TEXT NOT NULL,
+   name TEXT NOT NULL,
+   annotation TEXT NOT NULL,
+   content TEXT NOT NULL,
+   date DATE NOT NULL,
+   link TEXT,
+   degree INT NOT NULL,
+   element INT NOT NULL,
+   form INT NOT NULL,
+   format INT NOT NULL,
+   variant INT NOT NULL,
+   application INT NOT NULL,
+   blum INT NOT NULL,
+   difficulty INT NOT NULL
+);
